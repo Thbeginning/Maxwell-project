@@ -5,16 +5,32 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Helpers
+const dataDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, 'data');
+
+const ensureDataExists = (filename) => {
+    const targetPath = path.join(dataDir, filename);
+    const sourcePath = path.join(__dirname, 'data', filename);
+    if (!fs.existsSync(targetPath)) {
+        if (fs.existsSync(sourcePath)) {
+            fs.copyFileSync(sourcePath, targetPath);
+        } else {
+            fs.writeFileSync(targetPath, '[]');
+        }
+    }
+    return targetPath;
+};
+
 const readData = (filename) => {
     try {
-        const data = fs.readFileSync(path.join(__dirname, 'data', filename), 'utf8');
+        const filePath = ensureDataExists(filename);
+        const data = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(data);
     } catch (e) {
         return [];
@@ -22,13 +38,14 @@ const readData = (filename) => {
 };
 
 const writeData = (filename, data) => {
-    fs.writeFileSync(path.join(__dirname, 'data', filename), JSON.stringify(data, null, 2));
+    const filePath = ensureDataExists(filename);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 };
 
 // Initialize Seats if empty
 const initializeSeats = () => {
-    const seatsFile = path.join(__dirname, 'data', 'seats.json');
-    if (!fs.existsSync(seatsFile) || readData('seats.json').length === 0) {
+    const seatsFile = ensureDataExists('seats.json');
+    if (readData('seats.json').length === 0) {
         const stadiums = readData('stadiums.json');
         let seats = [];
         let seatId = 1;
@@ -157,6 +174,10 @@ app.get('/api/bookings', (req, res) => {
     res.json(readData('bookings.json'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
