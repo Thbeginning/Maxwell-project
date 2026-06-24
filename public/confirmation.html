@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .confirmation-box {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        .success-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">FIFA <span>2026</span></a>
+    </header>
+
+    <section class="section-container">
+        <div class="confirmation-box">
+            <div class="success-icon">✔️</div>
+            <h2 style="margin-bottom: 1rem;">Payment Successful!</h2>
+            <p style="font-size: 1.2rem;">Your ticket confirmation has been sent to your email.</p>
+            
+            <div style="margin: 2rem 0; padding: 1.5rem; background: var(--background-light); border-radius: 8px;">
+                <p><strong>Booking Reference:</strong> <span id="ref-text" style="font-size: 1.5rem; color: var(--primary-color);"></span></p>
+                <p><strong>Sent to:</strong> <span id="email-text"></span></p>
+            </div>
+
+            <a href="index.html" class="btn btn-primary">Return Home</a>
+            <button class="btn btn-accent" style="margin-left: 1rem;" onclick="window.print()">Print Ticket</button>
+        </div>
+    </section>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            const email = urlParams.get('email');
+
+            if (ref) safelySetText('ref-text', ref);
+            if (email) safelySetText('email-text', email);
+        });
+    </script>
+</body>
+</html>

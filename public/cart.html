@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">FIFA <span>2026</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stadiums.html">Stadiums</a></li>
+                <li><a href="matches.html">Matches</a></li>
+                <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="section-container">
+        <h2 class="section-title">Your Cart</h2>
+        <div style="background: white; padding: 2rem; border-radius: var(--border-radius); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <table id="cart-table">
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Seat</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-body">
+                    <!-- JS injected -->
+                </tbody>
+            </table>
+            
+            <div style="text-align: right; margin-top: 2rem;">
+                <h3>Total: $<span id="cart-total">0</span></h3>
+                <a href="checkout.html" class="btn btn-accent" style="margin-top: 1rem;" id="checkout-btn">Proceed to Checkout</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FIFA World Cup Ticket Booking Demo.</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const cart = await window.api.getCart();
+            const tbody = document.getElementById('cart-body');
+            const totalEl = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            if (cart.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">Your cart is empty.</td></tr>';
+                checkoutBtn.style.display = 'none';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price;
+                const tr = document.createElement('tr');
+                
+                const tdMatch = document.createElement('td');
+                tdMatch.textContent = item.match_name;
+                
+                const tdSeat = document.createElement('td');
+                tdSeat.textContent = item.seat_label;
+                
+                const tdCat = document.createElement('td');
+                tdCat.textContent = item.category;
+                
+                const tdPrice = document.createElement('td');
+                tdPrice.textContent = `$${item.price}`;
+                
+                const tdAction = document.createElement('td');
+                const delBtn = document.createElement('button');
+                delBtn.textContent = 'Remove';
+                delBtn.className = 'btn btn-primary';
+                delBtn.style.padding = '0.4rem 1rem';
+                delBtn.addEventListener('click', async () => {
+                    await window.api.removeFromCart(item.id);
+                    location.reload();
+                });
+                tdAction.appendChild(delBtn);
+                
+                tr.appendChild(tdMatch);
+                tr.appendChild(tdSeat);
+                tr.appendChild(tdCat);
+                tr.appendChild(tdPrice);
+                tr.appendChild(tdAction);
+                tbody.appendChild(tr);
+            });
+            
+            totalEl.textContent = total;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">FIFA <span>2026</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stadiums.html">Stadiums</a></li>
+                <li><a href="matches.html">Matches</a></li>
+                <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <section class="section-container">
+        <h2 class="section-title">Upcoming Matches</h2>
+        <div class="grid" id="matches-grid">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FIFA World Cup Ticket Booking Demo.</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const stadiumId = urlParams.get('stadium_id');
+            
+            const matches = await window.api.getMatches(stadiumId);
+            const stadiums = await window.api.getStadiums();
+            const container = document.getElementById('matches-grid');
+            
+            if (matches.length === 0) {
+                container.innerHTML = '<p>No matches found for this selection.</p>';
+                return;
+            }
+
+            matches.forEach(match => {
+                const stadium = stadiums.find(s => s.id == match.stadium_id);
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.borderTop = '4px solid var(--primary-color)';
+                
+                const content = document.createElement('div');
+                content.className = 'card-content';
+                
+                const teams = document.createElement('h3');
+                teams.className = 'card-title';
+                teams.style.fontSize = '1.5rem';
+                teams.textContent = `${match.home_team} vs ${match.away_team}`;
+                
+                const datetime = document.createElement('p');
+                datetime.innerHTML = `<strong>Date:</strong> ${match.date} | <strong>Time:</strong> ${match.time}`;
+                
+                const loc = document.createElement('p');
+                loc.innerHTML = `<strong>Stadium:</strong> ${stadium ? stadium.name : 'Unknown'}`;
+                
+                const btn = document.createElement('a');
+                btn.href = `seat-selection.html?match_id=${match.id}&stadium_id=${match.stadium_id}`;
+                btn.className = 'btn btn-primary';
+                btn.style.marginTop = '1rem';
+                btn.textContent = 'Select Seats';
+                
+                content.appendChild(teams);
+                content.appendChild(datetime);
+                content.appendChild(loc);
+                content.appendChild(btn);
+                
+                card.appendChild(content);
+                container.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

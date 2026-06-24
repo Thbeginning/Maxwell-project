@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seats | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .seat-map-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+        .map-wrapper {
+            flex: 2;
+        }
+        .seat-info {
+            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">FIFA <span>2026</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stadiums.html">Stadiums</a></li>
+                <li><a href="matches.html">Matches</a></li>
+                <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="section-container">
+        <h2 class="section-title">Select Your Seats</h2>
+        <div class="seat-map-container">
+            <div class="map-wrapper stadium-map" id="stadium-map">
+                <div class="pitch"></div>
+                <!-- Rows injected by JS -->
+            </div>
+            
+            <div class="seat-info">
+                <h3>Selection Summary</h3>
+                <p><strong>Match:</strong> <span id="match-details">Loading...</span></p>
+                <p><strong>Selected Seat:</strong> <span id="selected-seat-text">None</span></p>
+                
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Ticket Category</label>
+                    <select id="ticket-category" class="form-control">
+                        <!-- Options injected by JS -->
+                    </select>
+                </div>
+                
+                <p style="font-size: 1.2rem; margin-bottom: 1rem;"><strong>Price:</strong> $<span id="price-display">0</span></p>
+                <button class="btn btn-primary" id="add-to-cart-btn" disabled style="width: 100%;">Add to Cart</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FIFA World Cup Ticket Booking Demo.</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const matchId = urlParams.get('match_id');
+            const stadiumId = urlParams.get('stadium_id');
+            
+            if (!matchId || !stadiumId) return;
+
+            const [matches, seats] = await Promise.all([
+                window.api.getMatches(),
+                window.api.getSeats(stadiumId)
+            ]);
+            
+            const match = matches.find(m => m.id == matchId);
+            safelySetText('match-details', `${match.home_team} vs ${match.away_team}`);
+            
+            // Populate categories
+            const categorySelect = document.getElementById('ticket-category');
+            Object.entries(match.ticket_prices).forEach(([category, price]) => {
+                const opt = document.createElement('option');
+                opt.value = category;
+                opt.textContent = `${category} - $${price}`;
+                opt.dataset.price = price;
+                categorySelect.appendChild(opt);
+            });
+            
+            const priceDisplay = document.getElementById('price-display');
+            const updatePrice = () => {
+                const opt = categorySelect.options[categorySelect.selectedIndex];
+                safelySetText('price-display', opt.dataset.price);
+            };
+            categorySelect.addEventListener('change', updatePrice);
+            updatePrice();
+
+            // Render Map
+            const mapContainer = document.getElementById('stadium-map');
+            let selectedSeat = null;
+            const btnCart = document.getElementById('add-to-cart-btn');
+            
+            // Group seats by row
+            const rows = {};
+            seats.forEach(s => {
+                const key = `${s.section}-${s.row}`;
+                if (!rows[key]) rows[key] = [];
+                rows[key].push(s);
+            });
+            
+            Object.values(rows).forEach(rowSeats => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+                
+                rowSeats.forEach(seat => {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.className = `seat ${seat.status}`;
+                    seatDiv.textContent = seat.number;
+                    seatDiv.title = `Sec ${seat.section}, Row ${seat.row}, Seat ${seat.number}`;
+                    
+                    if (seat.status === 'available') {
+                        seatDiv.addEventListener('click', () => {
+                            // Deselect previous
+                            const prev = document.querySelector('.seat.selected');
+                            if (prev) prev.classList.remove('selected');
+                            
+                            seatDiv.classList.add('selected');
+                            selectedSeat = seat;
+                            safelySetText('selected-seat-text', seatDiv.title);
+                            btnCart.disabled = false;
+                        });
+                    }
+                    rowDiv.appendChild(seatDiv);
+                });
+                mapContainer.appendChild(rowDiv);
+            });
+            
+            btnCart.addEventListener('click', async () => {
+                if (!selectedSeat) return;
+                const opt = categorySelect.options[categorySelect.selectedIndex];
+                
+                const cartItem = {
+                    match_id: match.id,
+                    match_name: `${match.home_team} vs ${match.away_team}`,
+                    seat_id: selectedSeat.id,
+                    seat_label: `Sec ${selectedSeat.section}, Row ${selectedSeat.row}, Seat ${selectedSeat.number}`,
+                    category: opt.value,
+                    price: parseInt(opt.dataset.price),
+                    quantity: 1
+                };
+                
+                await window.api.addToCart(cartItem);
+                updateCartCount();
+                alert('Added to cart!');
+                window.location.href = 'cart.html';
+            });
+        });
+    </script>
+</body>
+</html>

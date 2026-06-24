@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Estadio Azteca",
+    "city": "Mexico City",
+    "country": "Mexico",
+    "capacity": 83264,
+    "image": "images/stadiums/azteca.jpg",
+    "map_layout": "azteca-layout"
+  },
+  {
+    "id": 2,
+    "name": "MetLife Stadium",
+    "city": "New York/New Jersey",
+    "country": "USA",
+    "capacity": 82500,
+    "image": "images/stadiums/metlife.jpg",
+    "map_layout": "metlife-layout"
+  },
+  {
+    "id": 3,
+    "name": "BMO Field",
+    "city": "Toronto",
+    "country": "Canada",
+    "capacity": 30000,
+    "image": "images/stadiums/bmo.jpg",
+    "map_layout": "bmo-layout"
+  },
+  {
+    "id": 4,
+    "name": "Wembley Stadium",
+    "city": "London",
+    "country": "UK",
+    "capacity": 90000,
+    "image": "images/stadiums/wembley.jpg",
+    "map_layout": "wembley-layout"
+  },
+  {
+    "id": 5,
+    "name": "Maracanã",
+    "city": "Rio de Janeiro",
+    "country": "Brazil",
+    "capacity": 78838,
+    "image": "images/stadiums/maracana.jpg",
+    "map_layout": "maracana-layout"
+  },
+  {
+    "id": 6,
+    "name": "Lusail Stadium",
+    "city": "Lusail",
+    "country": "Qatar",
+    "capacity": 88966,
+    "image": "images/stadiums/lusail.jpg",
+    "map_layout": "lusail-layout"
+  }
+]

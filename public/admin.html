@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | World Cup 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-nav {
+            background: #fff;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 1rem;
+        }
+        .admin-section {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .admin-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">FIFA <span>2026</span> Admin</a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Back to Site</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="section-container">
+        <div class="admin-nav">
+            <button class="btn btn-primary" onclick="showSection('bookings-sec')">Bookings</button>
+            <button class="btn btn-primary" onclick="showSection('stadiums-sec')">Manage Stadiums</button>
+            <button class="btn btn-primary" onclick="showSection('matches-sec')">Manage Matches</button>
+        </div>
+
+        <div id="bookings-sec" class="admin-section active">
+            <h3>Recent Bookings</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ref</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                    </tr>
+                </thead>
+                <tbody id="bookings-table"></tbody>
+            </table>
+        </div>
+
+        <div id="stadiums-sec" class="admin-section">
+            <h3>Add New Stadium</h3>
+            <form id="add-stadium-form" style="max-width: 500px; margin-top: 1rem;">
+                <div class="form-group">
+                    <label>Stadium Name</label>
+                    <input type="text" id="s-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" id="s-city" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" id="s-country" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" id="s-cap" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="s-img" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-accent">Save Stadium</button>
+            </form>
+        </div>
+
+        <div id="matches-sec" class="admin-section">
+            <h3>Add New Match</h3>
+            <form id="add-match-form" style="max-width: 500px; margin-top: 1rem;">
+                <div class="form-group">
+                    <label>Home Team</label>
+                    <input type="text" id="m-home" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Away Team</label>
+                    <input type="text" id="m-away" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="m-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" id="m-time" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Stadium ID</label>
+                    <input type="number" id="m-stad" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-accent">Save Match</button>
+            </form>
+        </div>
+    </section>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.admin-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load Bookings
+            const bookings = await window.api.getBookings();
+            const tbody = document.getElementById('bookings-table');
+            bookings.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${b.booking_ref}</td>
+                    <td>${b.name}</td>
+                    <td>${b.email}</td>
+                    <td>${b.payment_status}</td>
+                    <td>${b.items ? b.items.length : 0} item(s)</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Add Stadium
+            document.getElementById('add-stadium-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await window.api.createStadium({
+                    name: document.getElementById('s-name').value,
+                    city: document.getElementById('s-city').value,
+                    country: document.getElementById('s-country').value,
+                    capacity: parseInt(document.getElementById('s-cap').value),
+                    image: document.getElementById('s-img').value,
+                    map_layout: 'default-layout'
+                });
+                alert('Stadium Added!');
+                e.target.reset();
+            });
+
+            // Add Match
+            document.getElementById('add-match-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await window.api.createMatch({
+                    home_team: document.getElementById('m-home').value,
+                    away_team: document.getElementById('m-away').value,
+                    date: document.getElementById('m-date').value,
+                    time: document.getElementById('m-time').value,
+                    stadium_id: parseInt(document.getElementById('m-stad').value),
+                    ticket_stock: 10000,
+                    ticket_prices: { VIP: 500, Regular: 250, Economy: 100 }
+                });
+                alert('Match Added!');
+                e.target.reset();
+            });
+        });
+    </script>
+</body>
+</html>

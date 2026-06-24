@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA World Cup 2026 | Tickets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">FIFA <span>2026</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stadiums.html">Stadiums</a></li>
+                <li><a href="matches.html">Matches</a></li>
+                <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Experience The Glory</h1>
+            <p>Secure your tickets for the FIFA World Cup 2026 in North America.</p>
+            <a href="stadiums.html" class="btn btn-accent">Browse Venues</a>
+        </div>
+    </section>
+
+    <section class="section-container">
+        <h2 class="section-title">Featured Stadiums</h2>
+        <div class="grid" id="featured-stadiums">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FIFA World Cup Ticket Booking Demo.</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const stadiums = await window.api.getStadiums();
+            const container = document.getElementById('featured-stadiums');
+            
+            stadiums.slice(0, 3).forEach(stadium => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const img = document.createElement('img');
+                img.src = stadium.image;
+                img.alt = stadium.name;
+                
+                const content = document.createElement('div');
+                content.className = 'card-content';
+                
+                const title = document.createElement('h3');
+                title.className = 'card-title';
+                title.textContent = stadium.name;
+                
+                const location = document.createElement('p');
+                location.textContent = `${stadium.city}, ${stadium.country}`;
+                
+                const btn = document.createElement('a');
+                btn.href = `matches.html?stadium_id=${stadium.id}`;
+                btn.className = 'btn btn-primary';
+                btn.style.marginTop = '1rem';
+                btn.textContent = 'View Matches';
+                
+                content.appendChild(title);
+                content.appendChild(location);
+                content.appendChild(btn);
+                
+                card.appendChild(img);
+                card.appendChild(content);
+                container.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

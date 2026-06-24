@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "home_team": "Mexico",
+    "away_team": "Germany",
+    "date": "2026-06-11",
+    "time": "14:00",
+    "stadium_id": 1,
+    "ticket_stock": 5000,
+    "ticket_prices": { "VIP": 500, "Regular": 200, "Economy": 100 }
+  },
+  {
+    "id": 2,
+    "home_team": "USA",
+    "away_team": "England",
+    "date": "2026-06-12",
+    "time": "16:00",
+    "stadium_id": 2,
+    "ticket_stock": 8000,
+    "ticket_prices": { "VIP": 600, "Regular": 250, "Economy": 120 }
+  },
+  {
+    "id": 3,
+    "home_team": "Canada",
+    "away_team": "France",
+    "date": "2026-06-13",
+    "time": "18:00",
+    "stadium_id": 3,
+    "ticket_stock": 2000,
+    "ticket_prices": { "VIP": 400, "Regular": 180, "Economy": 80 }
+  },
+  {
+    "id": 4,
+    "home_team": "England",
+    "away_team": "Spain",
+    "date": "2026-06-15",
+    "time": "20:00",
+    "stadium_id": 4,
+    "ticket_stock": 10000,
+    "ticket_prices": { "VIP": 800, "Regular": 300, "Economy": 150 }
+  },
+  {
+    "id": 5,
+    "home_team": "Brazil",
+    "away_team": "Argentina",
+    "date": "2026-06-16",
+    "time": "17:00",
+    "stadium_id": 5,
+    "ticket_stock": 7000,
+    "ticket_prices": { "VIP": 450, "Regular": 200, "Economy": 90 }
+  },
+  {
+    "id": 6,
+    "home_team": "Qatar",
+    "away_team": "Japan",
+    "date": "2026-06-17",
+    "time": "19:00",
+    "stadium_id": 6,
+    "ticket_stock": 6000,
+    "ticket_prices": { "VIP": 700, "Regular": 280, "Economy": 130 }
+  }
+]
